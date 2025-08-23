@@ -9,7 +9,8 @@
     "start": "node dist/index.js",
     "prisma:studio": "prisma studio",
     "test": "NODE_OPTIONS=--experimental-vm-modules jest --passWithNoTests",
-    "test:coverage": "NODE_OPTIONS=--experimental-vm-modules jest --coverage"
+    "test:coverage": "NODE_OPTIONS=--experimental-vm-modules jest --coverage",
+    "gen:tables": "tsx src/scripts/genTables.ts"
   },
   "repository": {
     "type": "git",
@@ -29,6 +30,7 @@
     "mime-types": "^3.0.1",
     "morgan": "^1.10.1",
     "multer": "^2.0.2",
+    "qrcode": "^1.5.4",
     "sharp": "^0.34.3",
     "uuid": "^11.1.0"
   },
@@ -40,6 +42,7 @@
     "@types/morgan": "^1.9.10",
     "@types/multer": "^2.0.0",
     "@types/node": "^24.3.0",
+    "@types/qrcode": "^1.5.5",
     "@types/supertest": "^6.0.3",
     "jest": "^30.0.5",
     "nodemon": "^3.1.10",
@@ -47,6 +50,7 @@
     "supertest": "^7.1.4",
     "ts-jest": "^29.4.1",
     "ts-node": "^10.9.2",
+    "tsx": "^4.20.4",
     "typescript": "^5.9.2"
   },
   "type": "module"
