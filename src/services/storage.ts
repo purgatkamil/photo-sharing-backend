@@ -5,8 +5,8 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-export const DATA_DIR = process.env.DATA_DIR ||
-  path.resolve(__dirname, "../..", "data", "photos");
+export const DATA_DIR =
+  process.env.DATA_DIR || path.resolve(__dirname, "../..", "data", "photos");
 export const THUMBS_DIR = path.join(DATA_DIR, "_thumbs");
 
 export function ensureDir(p: string) {
@@ -24,4 +24,12 @@ export function tokenThumbDir(token: string) {
 export function initStorage() {
   ensureDir(DATA_DIR);
   ensureDir(THUMBS_DIR);
+}
+
+export function buildOriginalUrl(token: string, filename: string) {
+  return `/images/${token}/${filename}`;
+}
+
+export function buildThumbUrl(token: string, filename: string) {
+  return `/thumbs/${token}/${filename}`;
 }
