@@ -8,6 +8,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import cors from "cors";
 import fs from "fs";
+import { fileTypeFromFile } from "file-type";
 
 import { initStorage, tokenDir, DATA_DIR, THUMBS_DIR } from "./services/storage.js";
 import { prisma, findTableByToken } from "./services/db.js";
@@ -15,6 +16,11 @@ import { handleUpload } from "./controllers/uploadController.js";
 import { getGallery } from "./controllers/galleryController.js";
 import { registerClient, notifyTable } from "./services/sse.js"
 
+const ALLOWED_MIME = new Set<string>([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+]);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -74,9 +80,51 @@ app.post("/upload/:token", async (req, res) => {
 
   uploadMw(req, res, async (err) => {
     if (err) return res.status(400).json({ error: (err as Error).message });
+
     const files = (req.files as Express.Multer.File[]) || [];
-    const result = await handleUpload({ id: table.id, token: table.token }, files);
+
+    const safeFiles: Express.Multer.File[] = [];
+    const rejected: Array<{ name: string; reason: string }> = [];
+
+    for (const f of files) {
+      try {
+        const detected = await fileTypeFromFile(f.path);
+        const mime = detected?.mime;
+
+        if (!mime || !ALLOWED_MIME.has(mime)) {
+          try { fs.unlinkSync(f.path); } catch {}
+          rejected.push({
+            name: f.originalname,
+            reason: mime ? `Not allowed mime: ${mime}` : "Unknown/undetected type",
+          });
+          continue;
+        }
+
+        safeFiles.push(f);
+      } catch {
+        try { fs.unlinkSync(f.path); } catch {}
+        rejected.push({ name: f.originalname, reason: "Type detection error" });
+      }
+    }
+
+    if (safeFiles.length === 0) {
+      return res.status(400).json({
+        error: "All files rejected by content-type validation",
+        rejected,
+      });
+    }
+
+    const result = await handleUpload(
+      { id: table.id, token: table.token },
+      safeFiles
+    );
+
     notifyTable(table.token, { type: "new-photos" });
+
+    if (rejected.length > 0) {
+      return res.json({ ...result, rejected });
+    }
+
     res.json(result);
   });
 });

@@ -40,3 +40,7 @@ npm i -D tsx
 # Connecting with frontend
 npm i --save-dev @types/cors
 
+# Increased security
+npm i file-type
+
+
