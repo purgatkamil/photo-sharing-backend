@@ -43,4 +43,8 @@ npm i --save-dev @types/cors
 # Increased security
 npm i file-type
 
+npm i express-rate-limit
+npm i -D @types/express-rate-limit
+
+
 
