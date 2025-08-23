@@ -22,3 +22,9 @@ npx prisma migrate dev --name init
 npm i morgan dotenv
 npm i --save-dev @types/morgan
 
+# Files upload
+npm i multer sharp uuid mime-types
+npm i -D @types/multer @types/mime-types
+
+npx prisma studio
+
