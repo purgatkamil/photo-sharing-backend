@@ -4,9 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon --watch src --exec ts-node src/index.ts",
+    "dev": "nodemon --watch src --exec node --loader ts-node/esm --experimental-specifier-resolution=node src/index.ts",
     "build": "tsc",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "prisma:studio": "prisma studio"
   },
   "repository": {
     "type": "git",
@@ -20,12 +21,17 @@
   },
   "homepage": "https://github.com/purgatkamil/photo-sharing-backend#readme",
   "dependencies": {
-    "express": "^5.1.0"
+    "@prisma/client": "^6.14.0",
+    "dotenv": "^17.2.1",
+    "express": "^5.1.0",
+    "morgan": "^1.10.1"
   },
   "devDependencies": {
     "@types/express": "^5.0.3",
+    "@types/morgan": "^1.9.10",
     "@types/node": "^24.3.0",
     "nodemon": "^3.1.10",
+    "prisma": "^6.14.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.2"
   },
