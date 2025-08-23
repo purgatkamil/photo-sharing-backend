@@ -1,0 +1,29 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Table {
+  id        Int      @id @default(autoincrement())
+  name      String
+  token     String   @unique   // trafi do QR
+  createdAt DateTime @default(now())
+  uploads   Upload[]
+}
+
+model Upload {
+  id           Int      @id @default(autoincrement())
+  table        Table    @relation(fields: [tableId], references: [id])
+  tableId      Int
+  originalName String
+  storedName   String   // nazwa pliku na dysku
+  mimeType     String
+  size         Int
+  width        Int?
+  height       Int?
+  createdAt    DateTime @default(now())
+}
