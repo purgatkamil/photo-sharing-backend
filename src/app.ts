@@ -13,6 +13,8 @@ import { initStorage, tokenDir, DATA_DIR, THUMBS_DIR } from "./services/storage.
 import { prisma, findTableByToken } from "./services/db.js";
 import { handleUpload } from "./controllers/uploadController.js";
 import { getGallery } from "./controllers/galleryController.js";
+import { registerClient, notifyTable } from "./services/sse.js"
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -74,6 +76,7 @@ app.post("/upload/:token", async (req, res) => {
     if (err) return res.status(400).json({ error: (err as Error).message });
     const files = (req.files as Express.Multer.File[]) || [];
     const result = await handleUpload({ id: table.id, token: table.token }, files);
+    notifyTable(table.token, { type: "new-photos" });
     res.json(result);
   });
 });
@@ -85,6 +88,12 @@ app.get("/gallery/:token", async (req, res) => {
   const payload = await getGallery({ id: table.id, token: table.token });
   res.json(payload);
 });
+
+app.get("/events/:token", async (req, res) => {
+  const { token } = req.params as { token: string }
+  const ok = await registerClient(token, res)
+  if (!ok) return res.status(404).json({ error: "Unknown token" })
+})
 
 const FRONTEND_DIR = path.resolve(__dirname, "../../frontend/dist");
 
