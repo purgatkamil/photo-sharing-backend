@@ -28,3 +28,6 @@ npm i -D @types/multer @types/mime-types
 
 npx prisma studio
 
+# Unit tests
+npm i -D jest ts-jest @types/jest supertest @types/supertest
+npm i -D @types/jest
