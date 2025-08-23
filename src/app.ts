@@ -7,6 +7,7 @@ import mime from "mime-types";
 import path from "path";
 import { fileURLToPath } from "url";
 import cors from "cors";
+import fs from "fs";
 
 import { initStorage, tokenDir, DATA_DIR, THUMBS_DIR } from "./services/storage.js";
 import { prisma, findTableByToken } from "./services/db.js";
@@ -22,10 +23,9 @@ const app = express();
 app.use(morgan("dev"));
 app.use(express.json());
 
-app.use(cors({
-  origin: "http://localhost:5173",
-  credentials: false
-}));
+if (process.env.NODE_ENV !== "production") {
+  app.use(cors({ origin: "http://localhost:5173", credentials: false }));
+}
 
 app.use("/images", express.static(DATA_DIR));
 app.use("/thumbs", express.static(THUMBS_DIR));
@@ -43,14 +43,12 @@ const storage = multer.diskStorage({
   destination: (req, _file, cb) => {
     const token = (req.params as { token?: string }).token as string;
     const dir = tokenDir(token);
-    try {
-      import("./services/storage.js").then(({ ensureDir }) => {
+    import("./services/storage.js")
+      .then(({ ensureDir }) => {
         ensureDir(dir);
         cb(null, dir);
-      }).catch((e) => cb(e as Error, dir));
-    } catch (e) {
-      cb(e as Error, dir);
-    }
+      })
+      .catch((e) => cb(e as Error, dir));
   },
   filename: (_req, file, cb) => {
     const ext = (mime.extension(file.mimetype) || "bin").toString();
@@ -69,13 +67,11 @@ const uploadMw = multer({
 
 app.post("/upload/:token", async (req, res) => {
   const { token } = req.params as { token: string };
-
   const table = await findTableByToken(token);
   if (!table) return res.status(404).json({ error: "Unknown token" });
 
   uploadMw(req, res, async (err) => {
     if (err) return res.status(400).json({ error: (err as Error).message });
-
     const files = (req.files as Express.Multer.File[]) || [];
     const result = await handleUpload({ id: table.id, token: table.token }, files);
     res.json(result);
@@ -86,9 +82,22 @@ app.get("/gallery/:token", async (req, res) => {
   const { token } = req.params as { token: string };
   const table = await findTableByToken(token);
   if (!table) return res.status(404).json({ error: "Unknown token" });
-
   const payload = await getGallery({ id: table.id, token: table.token });
   res.json(payload);
 });
+
+const FRONTEND_DIR = path.resolve(__dirname, "../../frontend/dist");
+
+if (fs.existsSync(FRONTEND_DIR)) {
+  app.use(express.static(FRONTEND_DIR));
+
+  const apiPrefixes = /^(\/(images|thumbs|upload|gallery|health|qr)\b)/;
+  app.use((req, res, next) => {
+
+    if (apiPrefixes.test(req.path)) return next();
+    if (req.method !== "GET") return next();
+    res.sendFile(path.join(FRONTEND_DIR, "index.html"));
+  });
+}
 
 export default app;
