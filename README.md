@@ -31,3 +31,10 @@ npx prisma studio
 # Unit tests
 npm i -D jest ts-jest @types/jest supertest @types/supertest
 npm i -D @types/jest
+
+# QR codes
+npm i qrcode
+npm i -D @types/qrcode
+npm i -D tsx
+
+
