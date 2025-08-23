@@ -9,7 +9,7 @@
     // See also https://aka.ms/tsconfig/module
     "module": "nodenext",
     "target": "ES2020",
-    "types": [],
+    "types": ["node", "jest"],
     "moduleResolution": "NodeNext",
     // For nodejs:
     // "lib": ["esnext"],
@@ -42,5 +42,7 @@
     "moduleDetection": "force",
     "skipLibCheck": true,
     "esModuleInterop": true,
-  }
+  },
+  "include": ["src"], 
+  "exclude": ["node_modules", "dist", "__tests__"]
 }
