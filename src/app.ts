@@ -6,6 +6,7 @@ import { v4 as uuidv4 } from "uuid";
 import mime from "mime-types";
 import path from "path";
 import { fileURLToPath } from "url";
+import cors from "cors";
 
 import { initStorage, tokenDir, DATA_DIR, THUMBS_DIR } from "./services/storage.js";
 import { prisma, findTableByToken } from "./services/db.js";
@@ -20,6 +21,11 @@ initStorage();
 const app = express();
 app.use(morgan("dev"));
 app.use(express.json());
+
+app.use(cors({
+  origin: "http://localhost:5173",
+  credentials: false
+}));
 
 app.use("/images", express.static(DATA_DIR));
 app.use("/thumbs", express.static(THUMBS_DIR));

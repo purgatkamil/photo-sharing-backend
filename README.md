@@ -37,4 +37,6 @@ npm i qrcode
 npm i -D @types/qrcode
 npm i -D tsx
 
+# Connecting with frontend
+npm i --save-dev @types/cors
 
