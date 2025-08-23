@@ -1,0 +1,9 @@
+-- CreateTable
+CREATE TABLE "EventLog" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "tableId" INTEGER,
+    "type" TEXT NOT NULL,
+    "data" JSONB NOT NULL,
+    CONSTRAINT "EventLog_tableId_fkey" FOREIGN KEY ("tableId") REFERENCES "Table" ("id") ON DELETE SET NULL ON UPDATE CASCADE
+);

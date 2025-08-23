@@ -8,11 +8,12 @@ datasource db {
 }
 
 model Table {
-  id        Int      @id @default(autoincrement())
+  id        Int        @id @default(autoincrement())
   name      String
-  token     String   @unique   // trafi do QR
-  createdAt DateTime @default(now())
+  token     String     @unique // trafi do QR
+  createdAt DateTime   @default(now())
   uploads   Upload[]
+  eventLogs EventLog[]
 }
 
 model Upload {
@@ -20,10 +21,19 @@ model Upload {
   table        Table    @relation(fields: [tableId], references: [id])
   tableId      Int
   originalName String
-  storedName   String   // nazwa pliku na dysku
+  storedName   String // nazwa pliku na dysku
   mimeType     String
   size         Int
   width        Int?
   height       Int?
   createdAt    DateTime @default(now())
+}
+
+model EventLog {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  table     Table?   @relation(fields: [tableId], references: [id])
+  tableId   Int?
+  type      String // np. "upload_saved", "upload_error"
+  data      Json // szczegóły zdarzenia w JSON
 }
