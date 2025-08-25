@@ -16,6 +16,7 @@ import { handleUpload } from "./controllers/uploadController.js";
 import { getGallery } from "./controllers/galleryController.js";
 import { registerClient, notifyTable } from "./services/sse.js"
 import { ipUploadLimiter, tokenUploadLimiter } from "./services/rateLimiter.js";
+import adminDiskRouter from "./routes/adminDisk.js";
 
 const ALLOWED_MIME = new Set<string>([
   "image/jpeg",
@@ -148,6 +149,8 @@ app.get("/events/:token", async (req, res) => {
   const ok = await registerClient(token, res)
   if (!ok) return res.status(404).json({ error: "Unknown token" })
 })
+
+app.use("/admin", adminDiskRouter);
 
 const FRONTEND_DIR = path.resolve(__dirname, "../../frontend/dist");
 
